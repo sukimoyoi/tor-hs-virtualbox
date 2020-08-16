@@ -1,0 +1,14 @@
+- name: install nginx
+  apt:
+    name: nginx
+
+- name: copy HTML source files
+  copy:
+    src: ../../../../html
+    dest: /var/www/
+
+
+- name: start nginx
+  systemd:
+    name: nginx
+    state: started

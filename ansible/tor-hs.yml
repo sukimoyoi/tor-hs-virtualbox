@@ -1,0 +1,4 @@
+- hosts: tor-hs
+  sudo: yes
+  roles:
+    - hs

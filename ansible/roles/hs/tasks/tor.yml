@@ -1,0 +1,34 @@
+- name: add package links
+  lineinfile: dest=/etc/apt/sources.list line={{ item }}
+  with_items:
+      - "deb http://deb.torproject.org/torproject.org xenial main"
+      - "deb-src http://deb.torproject.org/torproject.org xenial main"
+
+- name: Add an apt key by id from a keyserver
+  apt_key: 
+    keyserver: keys.gnupg.net
+    id: A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+
+- name: install packages
+  apt: name={{ item }} update_cache=yes
+  with_items:
+    - tor
+    - deb.torproject.org-keyring
+
+- name: add configurations
+  lineinfile: dest=/etc/tor/torrc line={{ item }}
+  with_items:
+      - "HiddenServiceDir /var/lib/tor/hidden_service/"
+      - "HiddenServicePort 80 127.0.0.1:80"
+
+- name: reload Tor service
+  systemd:
+    name: tor
+    state: reloaded
+
+- shell: cat /var/lib/tor/hidden_service/hostname
+  register: cat_result
+
+- name: output .onion address
+  debug: 
+    var: cat_result.stdout_lines
